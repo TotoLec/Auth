@@ -4,6 +4,7 @@ const userModel = require('../model/User');
 const {registerValidation, loginValidation} = require('../validation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const verify = require('./verifyToken');
 
 //Register
 router.post('/register', async (req,res) => {
@@ -27,7 +28,11 @@ router.post('/register', async (req,res) => {
     });
     try{
         const savedUser = await user.save();
-        res.send({user: user._id});
+        // res.send({user: user._id});
+        
+        // Create ans assign token
+        const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
+        res.header('auth-token', token).send(token);
     }catch(err){
         res.status(400).send(err);
     }
@@ -52,5 +57,19 @@ router.post('/login', async (req,res) => {
     res.header('auth-token', token).send(token);
 
 });
+
+router.get('/getUser', verify,(req, res) => {
+    let userId = req.user
+
+    User.findById(userId._id)
+        .then(user => {
+            res.send(user);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).send("Erreur interne du serveur");
+        });
+})
+
 
 module.exports = router;

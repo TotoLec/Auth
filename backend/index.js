@@ -1,10 +1,11 @@
 const express = require('express');
 const app = express();
+var cors = require('cors');
+app.use(cors());
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 //Import route
 const authRoute = require('./routes/auth');
-const postroute = require('./routes/posts')
 
 dotenv.config();
 
@@ -18,6 +19,5 @@ mongoose.connect(process.env.DB_CONNECT,
 app.use(express.json());
 //Route Middlewares
 app.use('/api/user', authRoute);
-app.use('/api/posts', postroute);
 
 app.listen(3000, () => console.log('the server is ruinning'));
